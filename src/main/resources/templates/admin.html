@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | RealEstate</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1 { color: #142b52; }
+
+        .summary, .panel {
+            background: white;
+            padding: 22px;
+            margin-bottom: 22px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #00000012;
+        }
+
+        .summary strong {
+            font-size: 28px;
+            color: #c58a22;
+        }
+
+        .add-button, .edit-button, .delete-button, .home-button {
+            display: inline-block;
+            padding: 9px 13px;
+            border: 0;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .add-button { background: #142b52; color: white; }
+        .edit-button { background: #e8a323; color: #111; }
+        .delete-button { background: #c93636; color: white; }
+        .home-button { background: #e4e7ec; color: #222; }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 13px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th { background: #142b52; color: white; }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .actions form { margin: 0; }
+
+        .message {
+            padding: 12px;
+            background: #e2f5e8;
+            color: #176534;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 14px; }
+            th, td { padding: 9px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>Admin Dashboard</h1>
+
+    <div th:if="${successMessage}" class="message"
+         th:text="${successMessage}"></div>
+
+    <div th:if="${errorMessage}" class="message"
+         th:text="${errorMessage}"></div>
+
+    <div class="summary">
+        <p>Total Properties</p>
+        <strong th:text="${totalProperties}">0</strong>
+    </div>
+
+    <div class="panel">
+        <a class="add-button" th:href="@{/admin/properties/new}">
+            + Add Property
+        </a>
+        <a class="home-button" th:href="@{/}">
+            Back to Home
+        </a>
+    </div>
+
+    <div class="panel">
+        <h2>Manage Properties</h2>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Location</th>
+                    <th>Price (₹)</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="property : ${properties}">
+                    <td th:text="${property.id}">1</td>
+                    <td th:text="${property.title}">Property</td>
+                    <td th:text="${property.location}">Location</td>
+                    <td th:text="${property.price}">0</td>
+
+                    <td>
+                        <div class="actions">
+                            <a class="edit-button"
+                               th:href="@{/admin/properties/edit/{id}(id=${property.id})}">
+                                Edit
+                            </a>
+
+                            <form th:action="@{/admin/properties/delete/{id}(id=${property.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('Are you sure you want to delete this property?');">
+
+                                <button class="delete-button" type="submit">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(properties)}">
+                    <td colspan="5">No properties found.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

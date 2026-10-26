@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${formTitle}">Property Form</title>
+</head>
+<body>
+    <h1 th:text="${formTitle}">Property Form</h1>
+
+    <form th:action="@{/admin/properties/save}"
+          th:object="${property}" method="post">
+
+        <label>Title</label>
+        <input type="text" th:field="*{title}" required maxlength="100">
+        <br><br>
+
+        <label>Location</label>
+        <input type="text" th:field="*{location}" required maxlength="150">
+        <br><br>
+
+        <label>Property Type</label>
+        <input type="text" th:field="*{type}">
+        <br><br>
+
+        <label>Status</label>
+        <select th:field="*{status}">
+            <option value="FOR SALE">For Sale</option>
+            <option value="FOR RENT">For Rent</option>
+        </select>
+        <br><br>
+
+        <label>Price (₹)</label>
+        <input type="number" th:field="*{price}" min="0.01" step="0.01" required>
+        <br><br>
+
+        <label>Bedrooms</label>
+        <input type="number" th:field="*{bedrooms}" min="0">
+        <br><br>
+
+        <label>Bathrooms</label>
+        <input type="number" th:field="*{bathrooms}" min="0">
+        <br><br>
+
+        <label>Image URL</label>
+        <input type="url" th:field="*{imageUrl}">
+        <br><br>
+
+        <label>Description</label>
+        <textarea th:field="*{description}" rows="5"></textarea>
+        <br><br>
+
+        <button type="submit">Save Property</button>
+        <a th:href="@{/admin}">Cancel</a>
+    </form>
+</body>
+</html>

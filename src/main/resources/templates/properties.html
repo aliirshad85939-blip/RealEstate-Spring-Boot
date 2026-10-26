@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Search | RealEstate</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+
+        nav {
+            background: #123456;
+            color: white;
+            padding: 20px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        nav h2 { margin: 0; }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+
+        nav a:hover { text-decoration: underline; }
+
+        .container { padding: 35px 7%; }
+
+        .page-heading { margin-bottom: 25px; }
+
+        .page-heading p { color: #606b78; }
+
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000c;
+            margin: 25px 0;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .field label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .field input, .field select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccd3dc;
+            border-radius: 6px;
+            background: white;
+            font-size: 15px;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .btn {
+            display: inline-block;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            background: #123456;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn:hover { background: #1c527f; }
+
+        .btn-light {
+            background: #e8eef5;
+            color: #123456;
+        }
+
+        .results-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 25px 0 15px;
+        }
+
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 12px #00000012;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 22px #00000018;
+        }
+
+        .card img {
+            width: 100%;
+            height: 210px;
+            object-fit: cover;
+            display: block;
+            background: #e7edf4;
+        }
+
+        .image-placeholder {
+            height: 210px;
+            display: grid;
+            place-items: center;
+            background: #e7edf4;
+            color: #64748b;
+        }
+
+        .info { padding: 20px; }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 5px;
+            background: #e3f5e8;
+            color: #237442;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .type-tag {
+            background: #e8eef5;
+            color: #123456;
+        }
+
+        .info h2 {
+            font-size: 21px;
+            margin: 15px 0 10px;
+        }
+
+        .location {
+            color: #667085;
+            font-size: 14px;
+        }
+
+        .price {
+            color: #123456;
+            font-size: 23px;
+            font-weight: bold;
+            margin: 16px 0;
+        }
+
+        .details {
+            color: #596579;
+            font-size: 14px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #edf0f4;
+        }
+
+        .view-details {
+            display: block;
+            margin-top: 16px;
+            padding: 12px;
+            background: #123456;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .view-details:hover { background: #1c527f; }
+
+        .empty {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .error {
+            color: #a12622;
+            background: #fff0ef;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        footer {
+            background: #123456;
+            color: white;
+            text-align: center;
+            padding: 22px;
+            margin-top: 35px;
+        }
+
+        @media (max-width: 500px) {
+            nav { padding: 18px 5%; }
+            .container { padding: 25px 5%; }
+            .property-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <h2>RealEstate Portal</h2>
+    <a href="/">← Back to Home</a>
+</nav>
+
+<main class="container">
+
+    <div class="page-heading">
+        <h1>Find Your Property</h1>
+        <p>Search houses, flats and plots to find the right property for you.</p>
+    </div>
+
+    <form class="filters" action="/properties" method="get">
+        <div class="filter-grid">
+
+            <div class="field">
+                <label for="location">Location</label>
+                <input id="location" type="text" name="location"
+                       placeholder="e.g. Patna"
+                       th:value="${location}">
+            </div>
+
+            <div class="field">
+                <label for="type">Purpose</label>
+                <select id="type" name="type">
+                    <option value="">All properties</option>
+                    <option value="SALE" th:selected="${type == 'SALE'}">Buy / Sale</option>
+                    <option value="RENT" th:selected="${type == 'RENT'}">Rent</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="minPrice">Minimum price (₹)</label>
+                <input id="minPrice" type="number" name="minPrice"
+                       min="0" step="1" placeholder="Minimum"
+                       th:value="${minPrice}">
+            </div>
+
+            <div class="field">
+                <label for="maxPrice">Maximum price (₹)</label>
+                <input id="maxPrice" type="number" name="maxPrice"
+                       min="0" step="1" placeholder="Maximum"
+                       th:value="${maxPrice}">
+            </div>
+
+        </div>
+
+        <div class="filter-actions">
+            <button class="btn" type="submit">Search Properties</button>
+            <a class="btn btn-light" href="/properties">Clear Filters</a>
+        </div>
+    </form>
+
+    <p class="error" th:if="${errorMessage != null}"
+       th:text="${errorMessage}"></p>
+
+    <div class="results-summary">
+        <div>
+            <h2>Property Search Results</h2>
+            <p>
+                Properties found:
+                <strong th:text="${#lists.size(properties)}">0</strong>
+            </p>
+        </div>
+    </div>
+
+    <div class="property-grid" th:if="${!#lists.isEmpty(properties)}">
+
+        <article class="card" th:each="property : ${properties}">
+
+            <img th:if="${property.imageUrl != null
+                         and !#strings.isEmpty(property.imageUrl)}"
+                 th:src="${property.imageUrl}"
+                 th:alt="${property.title}">
+
+            <div class="image-placeholder"
+                 th:if="${property.imageUrl == null
+                         or #strings.isEmpty(property.imageUrl)}">
+                Property image unavailable
+            </div>
+
+            <div class="info">
+
+                <div class="tags">
+                    <span class="tag"
+                          th:text="${type != null and type == 'RENT'
+                              ? 'FOR RENT'
+                              : (type != null and type == 'SALE'
+                                  ? 'FOR SALE' : 'PROPERTY')}">
+                        PROPERTY
+                    </span>
+
+                    <span class="tag type-tag"
+                          th:text="${property.type}">
+                        House
+                    </span>
+                </div>
+
+                <h2 th:text="${property.title}">Property title</h2>
+
+                <p class="location">
+                    📍 <span th:text="${property.location}">Location</span>
+                </p>
+
+               <p class="price"
+   th:text="${'₹' + #numbers.formatDecimal(
+       property.price, 1, 'COMMA', 0, 'POINT')}">
+    ₹0
+</p>
+                <p class="details">
+                    <span th:text="${property.bedrooms}">0</span>
+                    Bedrooms
+                    <span> · </span>
+                    <span th:text="${property.bathrooms}">0</span>
+                    Bathrooms
+                </p>
+
+                <a class="view-details"
+                   th:href="@{/property/{id}(id=${property.id})}">
+                    View Details
+                </a>
+
+            </div>
+        </article>
+
+    </div>
+
+    <div class="empty" th:if="${#lists.isEmpty(properties)}">
+        <h3>No properties found</h3>
+        <p>Try another location, price range or purpose.</p>
+        <a class="btn" href="/properties">Show All Properties</a>
+    </div>
+
+</main>
+
+<footer>
+    <h3>RealEstate Portal</h3>
+    <p>Find a place you can call home.</p>
+</footer>
+
+</body>
+</html>
